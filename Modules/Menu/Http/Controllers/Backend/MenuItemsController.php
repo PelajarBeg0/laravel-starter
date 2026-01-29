@@ -77,7 +77,7 @@ class MenuItemsController extends BackendBaseController
 
         // Clear menu cache when a new menu item is created
         if ($$module_name_singular->menu) {
-            \Modules\Menu\Models\Menu::clearMenuCache($$module_name_singular->menu->location);
+            $module_model::clearMenuCache($$module_name_singular->menu->location);
         }
 
         flash("New '".Str::singular($module_title)."' Added")->success()->important();
@@ -171,7 +171,7 @@ class MenuItemsController extends BackendBaseController
 
         // Clear menu cache when a menu item is updated
         if ($$module_name_singular->menu) {
-            \Modules\Menu\Models\Menu::clearMenuCache($$module_name_singular->menu->location);
+            $module_model::clearMenuCache($$module_name_singular->menu->location);
         }
 
         flash(Str::singular($module_title)."' Updated Successfully")->success()->important();
