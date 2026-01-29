@@ -4,6 +4,7 @@ namespace Modules\Menu\Http\Controllers\Backend;
 
 use App\Authorizable;
 use App\Http\Controllers\Backend\BackendBaseController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class MenusController extends BackendBaseController
@@ -26,6 +27,67 @@ class MenusController extends BackendBaseController
 
         // module model name, path
         $this->module_model = "Modules\Menu\Models\Menu";
+    }
+
+    /**
+     * Store a new resource in the database.
+     *
+     * @param  Request  $request  The request object containing the data to be stored.
+     * @return \Illuminate\Http\RedirectResponse The response object that redirects to the index page of the module.
+     *
+     * @throws \Exception If there is an error during the creation of the resource.
+     */
+    public function store(Request $request)
+    {
+        $module_title = $this->module_title;
+        $module_name = $this->module_name;
+        $module_model = $this->module_model;
+        $module_name_singular = Str::singular($module_name);
+
+        $module_action = 'Store';
+
+        $$module_name_singular = $module_model::create($request->all());
+
+        // Clear menu cache when a new menu is created
+        $module_model::clearMenuCache($$module_name_singular->location);
+
+        flash("New '".Str::singular($module_title)."' Added")->success()->important();
+
+        logUserAccess($module_title.' '.$module_action.' | Id: '.$$module_name_singular->id);
+
+        return redirect("admin/{$module_name}");
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  Request  $request  The request object.
+     * @param  int  $id  The ID of the resource to update.
+     * @return \Illuminate\Http\RedirectResponse The redirect response.
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException If the resource is not found.
+     */
+    public function update(Request $request, $id)
+    {
+        $module_title = $this->module_title;
+        $module_name = $this->module_name;
+        $module_model = $this->module_model;
+        $module_name_singular = Str::singular($module_name);
+
+        $module_action = 'Update';
+
+        $$module_name_singular = $module_model::findOrFail($id);
+
+        $$module_name_singular->update($request->all());
+
+        // Clear menu cache when a menu is updated
+        $module_model::clearMenuCache($$module_name_singular->location);
+
+        flash(Str::singular($module_title)."' Updated Successfully")->success()->important();
+
+        logUserAccess($module_title.' '.$module_action.' | Id: '.$$module_name_singular->id);
+
+        return redirect()->route("backend.{$module_name}.show", $$module_name_singular->id);
     }
 
     /**
@@ -95,42 +157,12 @@ class MenusController extends BackendBaseController
         $$module_name_singular->delete();
 
         // Clear menu cache for this location
-        \Modules\Menu\Models\Menu::clearMenuCache($location);
+        $module_model::clearMenuCache($location);
 
         flash(Str::singular($module_title).' Deleted Successfully!')->success()->important();
 
         logUserAccess($module_title.' '.$module_action.' | Id: '.$$module_name_singular->id);
 
         return redirect()->route("backend.{$module_name}.index");
-    }
-
-    /**
-     * Updates a resource.
-     *
-     * @param  Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function update(\Illuminate\Http\Request $request, $id)
-    {
-        $module_title = $this->module_title;
-        $module_name = $this->module_name;
-        $module_model = $this->module_model;
-        $module_name_singular = Str::singular($module_name);
-
-        $module_action = 'Update';
-
-        $$module_name_singular = $module_model::findOrFail($id);
-
-        $$module_name_singular->update($request->all());
-
-        // Clear menu cache for this location
-        \Modules\Menu\Models\Menu::clearMenuCache($$module_name_singular->location);
-
-        flash(Str::singular($module_title)."' Updated Successfully")->success()->important();
-
-        logUserAccess($module_title.' '.$module_action.' | Id: '.$$module_name_singular->id);
-
-        return redirect()->route("backend.{$module_name}.show", $$module_name_singular->id);
     }
 }
