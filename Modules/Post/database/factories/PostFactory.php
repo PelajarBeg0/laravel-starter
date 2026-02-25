@@ -26,16 +26,18 @@ class PostFactory extends Factory
      */
     public function definition()
     {
+        $this->faker = \Faker\Factory::create('id_ID');
+
         return [
-            'name' => substr($this->faker->text(30), 0, -1),
+            'name' => substr($this->faker->sentence(rand(6, 10)), 0, -1),
             'slug' => '',
             'intro' => $this->faker->paragraph,
             'content' => $this->faker->paragraphs(rand(5, 7), true),
-            'type' => $this->faker->randomElement(PostType::getAllNames()),
+            'type' => $this->faker->randomElement(PostType::getAllValues()),
             'is_featured' => $this->faker->randomElement([1, 0]),
-            'image' => 'https://picsum.photos/1200/630?random='.rand(1, 50),
-            'status' => $this->faker->randomElement(PostStatus::getAllNames()),
-            'category_id' => $this->faker->numberBetween(1, 5),
+            'image' => 'https://picsum.photos/1200/630?random='.rand(1, 100),
+            'status' => $this->faker->randomElement(PostStatus::getAllValues()),
+            'category_id' => $this->faker->numberBetween(1, 6),
             'meta_title' => '',
             'meta_keywords' => '',
             'meta_description' => '',

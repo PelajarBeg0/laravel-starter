@@ -25,8 +25,10 @@ class TagFactory extends Factory
      */
     public function definition()
     {
+        $this->faker = \Faker\Factory::create('id_ID');
+
         return [
-            'name' => substr($this->faker->text(15), 0, -1),
+            'name' => substr($this->faker->words(2, true), 0, 20),
             'slug' => '',
             'description' => $this->faker->paragraph,
             'status' => $this->faker->randomElement(TagStatus::cases()),
